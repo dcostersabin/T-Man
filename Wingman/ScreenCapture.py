@@ -24,11 +24,10 @@ class Capture:
 
     def __save(self):
         self.main_device.pull('/sdcard/tinder_check.png', f'{self.base_dir}/temp/temp.png')
-        self.__resize()
 
     def __resize(self):
         img = cv2.imread(f'{self.base_dir}/temp/temp.png')
         height, width = img.shape[0], img.shape[1]
-        height_cutoff = height // 6
+        height_cutoff = height // 4
         crop_image = img[height_cutoff: height - height_cutoff, :]
         cv2.imwrite(f'{self.base_dir}/temp/temp.png', crop_image)

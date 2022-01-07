@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import cv2
+from yolo.Detection import Detection
 
 MODEL_MEAN_VALUES = (78.4263377603, 87.7689143744, 114.895847746)
 age_list = ['(0, 2)', '(4, 6)', '(8, 12)', '(15, 20)', '(25, 32)', '(38, 43)', '(48, 53)', '(60, 100)']
@@ -9,17 +10,22 @@ gender_list = ['Male', 'Female']
 
 class Model:
 
-    def __init__(self):
+    def __init__(self, detection_type='haarcascade'):
         self.age_net = None
         self.gender_net = None
+        self.detection_type = detection_type
         self.base_dir = Path(__file__).resolve().parent.parent
         self.frontal_face_cascade = cv2.CascadeClassifier(f'{self.base_dir}/data/haarcascade_frontalface_alt.xml')
+        self.person_detected = False
         self.detected_genders = list()
         self.detected_ages = list()
+        self.__detect_person()
         self.__initialize_model()
-        self.__detect_face()
 
     def __initialize_model(self):
+        if not self.person_detected:
+            return
+
         self.age_net = cv2.dnn.readNetFromCaffe(
             f'{self.base_dir}/data/deploy_age.prototxt',
             f'{self.base_dir}/data/age_net.caffemodel')
@@ -27,6 +33,14 @@ class Model:
         self.gender_net = cv2.dnn.readNetFromCaffe(
             f'{self.base_dir}/data/deploy_gender.prototxt',
             f'{self.base_dir}/data/gender_net.caffemodel')
+
+        self.__detect_face()
+
+    def __detect_person(self):
+        print("++++++ Detection Person ++++++")
+        image = cv2.imread(f'{self.base_dir}/temp/temp.png')
+        detector = Detection(image, save=True)
+        self.person_detected = True if detector.filter_counts['person'] > 0 else False
 
     def __detect_face(self):
         image = cv2.imread(f'{self.base_dir}/temp/temp.png')
