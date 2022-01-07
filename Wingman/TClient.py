@@ -31,7 +31,7 @@ class TClient(Client):
     def __check_tinder(self):
         tinder = TinderCheck(self.main_device)
         if tinder.exists:
-            time.sleep(2)
+            time.sleep(5)
             self.__start()
 
     def __start(self):
@@ -47,4 +47,3 @@ class TClient(Client):
 
     def __close(self):
         sys.exit(f'Device Not Detected. Device Count {len(self.devices())}')
-
